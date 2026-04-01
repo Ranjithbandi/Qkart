@@ -6,6 +6,7 @@ package org.example;
 import java.net.URL;
 import java.time.Duration;
 
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.devtools.v120.browser.Browser;
@@ -13,11 +14,15 @@ import org.openqa.selenium.edge.EdgeDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.Wait;
+import org.openqa.selenium.support.ui.WebDriverWait;
+
 import io.github.bonigarcia.wdm.WebDriverManager;
 
 public class QcartSanity {
 
-    public WebDriver browsersetup(String Browser) {
+    public static WebDriver browsersetup(String Browser) {
         WebDriver driver;
         switch (Browser.toLowerCase()) {
             case "chrome":
@@ -38,12 +43,47 @@ public class QcartSanity {
         return driver;
     }
 
-    public static void main(String[] args) throws InterruptedException {
-        QcartSanity qs = new QcartSanity();
-        WebDriver driver = qs.browsersetup("chrome");
+    public static void logstatus(String Type, String Message, String Status) {
+        System.out.printf("%s | %s | %s | %s", java.time.LocalDateTime.now(), Type, Message, Status);
+    }
+
+    public static boolean TestCase_001(WebDriver driver) throws InterruptedException {
+        boolean Status;
+        logstatus("TestCase_001", "Successfully Started", "Pass");
         Home home = new Home(driver);
         home.navigatetoHomepage();
-        driver.manage().timeouts().pageLoadTimeout(Duration.ofSeconds(60));
-        home.ClickonRegister();
+        WebDriverWait Wait = new WebDriverWait(driver, Duration.ofSeconds(50));
+        Wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//P[text()=\"India’s \"]")));
+        Status = home.ClickonRegister();
+        if (!Status) {
+            logstatus("ClickonRegister", "Failed to click on Register", "Fail");
+            logstatus("Testcase_001", "Execution Failed", Status ? "Pass" : "Fail");
+        }
+        return Status;
+
+    }
+
+    public static void main(String[] args) {
+        int TotalTestCases = 0;
+        int PassedTestCases = 0;
+        boolean Status;
+        WebDriver driver = browsersetup("chrome");
+        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
+        driver.manage().window().maximize();
+        try {
+            TotalTestCases += 1;
+            Status = TestCase_001(driver);
+            if (Status) {
+                PassedTestCases += 1;
+            }
+            System.out.println("");
+
+        } catch (Exception e) {
+            System.out.println("Exception occurred during test execution: " + e.getMessage());
+        } finally {
+            driver.quit();
+            System.out.printf("%s Out of %s Test cases Passed", Integer.toString(PassedTestCases),
+                    Integer.toString(TotalTestCases), Integer.toString((PassedTestCases * 100) / TotalTestCases));
+        }
     }
 }
