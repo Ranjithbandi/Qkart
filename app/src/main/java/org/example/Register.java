@@ -34,7 +34,7 @@ public class Register {
         }
         WebElement User_Password_txt_box = driver.findElement(By.xpath("//input[@id='password']"));
         WebElement confirm_password_txt_box = driver.findElement(By.xpath("//input[@id='confirmPassword']"));
-        WebElement register_btn = driver.findElement(By.xpath("//button[@id='registerBtn']"));
+        WebElement register_btn = driver.findElement(By.xpath("//button[text()=\"Register\"]"));
         username_txt_box.sendKeys(test_data_username);
         User_Password_txt_box.sendKeys(Password);
         confirm_password_txt_box.sendKeys(Password);

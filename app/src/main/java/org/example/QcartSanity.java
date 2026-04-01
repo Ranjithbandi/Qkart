@@ -59,6 +59,13 @@ public class QcartSanity {
             logstatus("ClickonRegister", "Failed to click on Register", "Fail");
             logstatus("Testcase_001", "Execution Failed", Status ? "Pass" : "Fail");
         }
+        Register register = new Register(driver);
+        register.navigatetoRegister();
+        Status = register.Registeruser("Test_001", "Password@123", true);
+        if (!Status) {
+            logstatus("Registeruser", "Failed to Register user", "Fail");
+            logstatus("Testcase_001", "Execution Failed", Status ? "Pass" : "Fail");
+        }
         return Status;
 
     }
