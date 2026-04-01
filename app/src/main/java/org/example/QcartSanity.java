@@ -8,6 +8,7 @@ import java.time.Duration;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.devtools.v120.browser.Browser;
 import org.openqa.selenium.edge.EdgeDriver;
@@ -21,6 +22,7 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import io.github.bonigarcia.wdm.WebDriverManager;
 
 public class QcartSanity {
+    String last_userName;
 
     public static WebDriver browsersetup(String Browser) {
         WebDriver driver;
@@ -49,6 +51,7 @@ public class QcartSanity {
 
     public static boolean TestCase_001(WebDriver driver) throws InterruptedException {
         boolean Status;
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(30));
         logstatus("TestCase_001", "Successfully Started", "Pass");
         Home home = new Home(driver);
         home.navigatetoHomepage();
@@ -66,8 +69,27 @@ public class QcartSanity {
             logstatus("Registeruser", "Failed to Register user", "Fail");
             logstatus("Testcase_001", "Execution Failed", Status ? "Pass" : "Fail");
         }
-        return Status;
+        String last_userName = register.last_username;
 
+        Status = register.Registeruser(last_userName, "Password@123", false);
+        WebElement Alert_poup = driver.findElement(By.xpath("//div[@role='alert']"));
+        try {
+            wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//div[@role='alert']")));
+        } catch (Exception e) {
+            return false;
+        }
+        if (driver.getCurrentUrl().contains("/Login")) {
+            logstatus("Registeruser", "Duplicate user registration allowed", "Fail");
+            logstatus("Testcase_001", "Execution Failed", Status ? "Pass" : "Fail");
+            return false;
+        }
+        String Alert_message = Alert_poup.getText();
+        if (!Alert_message.contains("Username already exists")) {
+            logstatus("Registeruser", "Incorrect alert message for duplicate user registration", "Fail");
+            logstatus("Testcase_001", "Execution Failed", Status ? "Pass" : "Fail");
+            return false;
+        }
+        return Status;
     }
 
     public static void main(String[] args) {

@@ -12,6 +12,7 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 public class Register {
     WebDriver driver;
     String url = "https://qcart-frontend.vercel.app/register";
+    public String last_username = "";
 
     public Register(WebDriver driver) {
         this.driver = driver;
@@ -44,7 +45,7 @@ public class Register {
             wait.until(ExpectedConditions.urlToBe("https://crio-qkart-qa.vercel.app/login"));
         } catch (Exception e) {
 
-            String last_username = test_data_username;
+            this.last_username = test_data_username;
 
         }
         return driver.getCurrentUrl().contains("/login");
