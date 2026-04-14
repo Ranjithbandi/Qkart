@@ -1,0 +1,68 @@
+package org.example;
+
+import java.sql.Timestamp;
+import java.time.Duration;
+
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.FluentWait;
+import org.openqa.selenium.support.ui.Wait;
+import org.openqa.selenium.support.ui.WebDriverWait;
+
+public class Register {
+    WebDriver driver;
+    String url = "https://qcart-frontend.vercel.app/register";
+    public String last_username = "";
+
+    public Register(WebDriver driver) {
+        this.driver = driver;
+    }
+
+    public void navigatetoRegister() {
+        if (!driver.getCurrentUrl().equals(this.url)) {
+            driver.get(this.url);
+        }
+    }
+
+    public boolean Registeruser(String username, String Password, boolean MakeUsernameDynamic) {
+        WebElement username_txt_box = driver.findElement(By.xpath("//input[@id='username']"));
+        Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+        String test_data_username;
+        if (MakeUsernameDynamic) {
+            test_data_username = username + "_" + timestamp;
+        } else {
+            test_data_username = username;
+        }
+        WebElement User_Password_txt_box = driver.findElement(By.xpath("//input[@id='password']"));
+        WebElement confirm_password_txt_box = driver.findElement(By.xpath("//input[@id='confirmPassword']"));
+        WebElement register_btn = driver.findElement(By.xpath("//button[text()=\"Register\"]"));
+        username_txt_box.sendKeys(test_data_username);
+        User_Password_txt_box.sendKeys(Password);
+        confirm_password_txt_box.sendKeys(Password);
+        register_btn.click();
+        try {
+            WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(30));
+            wait.until(ExpectedConditions.urlToBe("https://crio-qkart-qa.vercel.app/login"));
+        } catch (Exception e) {
+
+            this.last_username = test_data_username;
+
+        }
+        return driver.getCurrentUrl().contains("/login");
+    }
+
+    public boolean UserAlreadyExists() {
+        Registeruser(this.last_username, "Password@123", false);
+        return driver.getCurrentUrl().contains("/register");
+    }
+
+    public boolean Userlogin_Hyperlink() {
+        WebElement Userlogin_hyperlink = driver.findElement(By.xpath("//a[@href='/login']"));
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(30));
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//a[@href='/login']")));
+        Userlogin_hyperlink.click();
+        return driver.getCurrentUrl().contains("/login");
+    }
+}
